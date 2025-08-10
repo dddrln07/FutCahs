@@ -1,0 +1,40 @@
+CREATE TABLE IF NOT EXISTS users (
+  id BIGSERIAL PRIMARY KEY,
+  nome TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  senha TEXT NOT NULL,
+  saldo_coins BIGINT NOT NULL DEFAULT 0,
+  is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+  criado_em TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS matches (
+  id BIGSERIAL PRIMARY KEY,
+  tipo_jogo TEXT NOT NULL,
+  jogador1_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  jogador2_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
+  vencedor_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
+  valor_aposta BIGINT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  data TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS transactions (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
+  tipo TEXT NOT NULL CHECK (tipo IN ('compra','premio','taxa','aposta')),
+  valor BIGINT NOT NULL,
+  data TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS quiz_questions (
+  id BIGSERIAL PRIMARY KEY,
+  pergunta TEXT NOT NULL,
+  opcoes JSONB NOT NULL,
+  resposta_correta TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
